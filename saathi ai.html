@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="hi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saathi – Voice Companion for Seniors</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪔</text></svg>">
+<style>
+:root{--bg:#fff8ef;--card:#fff;--ink:#2b2118;--mute:#6b5a4a;--acc:#c2570c;--acc2:#e8731a;--ok:#2e7d32;--bad:#b3261e;--line:#ecd9c3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1510;--card:#261e17;--ink:#f6ebdd;--mute:#c4b3a0;--acc:#f0903f;--acc2:#d9742a;--ok:#7bc67f;--bad:#ff8a80;--line:#3d3126}}
+:root[data-theme="dark"]{--bg:#1b1510;--card:#261e17;--ink:#f6ebdd;--mute:#c4b3a0;--acc:#f0903f;--acc2:#d9742a;--ok:#7bc67f;--bad:#ff8a80;--line:#3d3126}
+:root[data-hc="1"]{--bg:#000;--card:#000;--ink:#fff;--mute:#ffe9a8;--acc:#ffd400;--acc2:#ffd400;--line:#fff;--ok:#5dff7a;--bad:#ff6b6b}
+*{box-sizing:border-box}html{font-size:18px}body{margin:0;background:var(--bg);color:var(--ink);font:1.1rem/1.5 Georgia,"Noto Serif Devanagari",serif}
+header{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:1.5rem}h2{margin:0 0 10px;font-size:1.2rem;color:var(--acc)}h3{margin:14px 0 6px}
+.bt{font:inherit;font-size:.9rem;padding:7px 14px;border:2px solid var(--acc);background:none;color:var(--ink);border-radius:99px;cursor:pointer}
+.bt.on{background:var(--acc);color:var(--bg)}
+nav{display:flex;gap:8px;overflow-x:auto;padding:10px 18px;border-bottom:1px solid var(--line)}
+nav .bt{white-space:nowrap;font-size:1rem}
+main{max-width:1000px;margin:0 auto;padding:18px}
+.g{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}@media(max-width:800px){.g{grid-template-columns:1fr}}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
+.mic{display:block;margin:6px auto;width:160px;height:160px;border-radius:50%;border:0;background:var(--acc2);color:#fff;font:700 1.3rem Georgia,serif;cursor:pointer;box-shadow:0 6px 24px #c2570c55}
+.mic.on{background:var(--bad);animation:p 1.1s infinite}@keyframes p{50%{transform:scale(1.06)}}
+#chat{height:260px;overflow-y:auto;padding:8px;border:1px solid var(--line);border-radius:12px;margin:10px 0}
+.b{max-width:88%;padding:9px 14px;border-radius:16px;margin:6px 0}.u{background:var(--line);margin-left:auto}.s{background:var(--acc);color:#fff}
+:root[data-hc="1"] .s{color:#000}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+form{display:flex;gap:8px;flex-wrap:wrap}input[type=text],input[type=time],textarea{flex:1;min-width:0;font:inherit;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+textarea{width:100%;min-height:110px}
+.pri{font:inherit;padding:10px 20px;border:0;border-radius:12px;background:var(--acc);color:var(--bg);cursor:pointer;font-weight:700}
+.rem{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.ok{color:var(--ok);font-weight:700}.mu{color:var(--mute)}
+.alert{border-left:6px solid var(--bad);padding:8px 12px;margin:8px 0;background:var(--bg);border-radius:8px}.alert.warn{border-color:var(--acc)}
+label{display:flex;gap:10px;align-items:center;margin:10px 0}input[type=checkbox]{width:22px;height:22px}
+.v{padding:14px;border-radius:12px;margin-top:12px;font-weight:700}.v.hi{background:var(--bad);color:#fff}.v.me{background:var(--acc);color:#fff}.v.lo{background:var(--ok);color:#fff}
+:root[data-hc="1"] .v{color:#000}
+ul{padding-left:1.2rem;margin:6px 0}li{margin:4px 0}
+#sos{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:76px;height:76px;border-radius:50%;border:0;background:var(--bad);color:#fff;font:700 1.2rem Georgia,serif;cursor:pointer;box-shadow:0 4px 16px #0006;z-index:5}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;display:none;z-index:6;max-width:90%}
+small{color:var(--mute)}
+</style></head><body>
+<header><h1>🪔 Saathi <small id="tag"></small></h1>
+<div><button class="bt" id="fm" aria-label="smaller text">A−</button> <button class="bt" id="fp" aria-label="bigger text">A+</button> <button class="bt" id="hc">◐</button> <button class="bt" id="lhi">हिन्दी</button> <button class="bt" id="len">English</button></div></header>
+<nav id="nav"></nav><main id="app"></main>
+<button id="sos" aria-label="SOS">SOS</button><div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+const S={lang:'hi',page:'home',fs:1,hc:false,chat:[],log:{chats:0,scam:0,distress:0,lonely:0},alerts:[],
+rems:[{t:'08:00',hi:'ब्लड प्रेशर की गोली',en:'Blood pressure tablet',d:0},{t:'11:00',hi:'पानी पीना',en:'Drink water',d:0},{t:'13:00',hi:'दोपहर का खाना',en:'Lunch',d:0},{t:'17:00',hi:'डॉक्टर को कॉल',en:'Call the doctor',d:0}],
+consent:{summary:true,alerts:true,rems:true}};
+const L=o=>typeof o==='string'?o:o[S.lang];
+const PAGES=[['home',{hi:'बात करें',en:'Talk'}],['rem',{hi:'याद दिलाना',en:'Reminders'}],['scam',{hi:'ठगी से बचाव',en:'Scam Shield'}],['fam',{hi:'परिवार',en:'Family'}],['priv',{hi:'सुरक्षा व निजता',en:'Safety & Privacy'}],['about',{hi:'हमारे बारे में',en:'About'}]];
+const CH={hi:['मुझे OTP माँगने वाला फ़ोन आया','मैंने दवा ले ली','मैं बहुत अकेली हूँ','मेरे सीने में दर्द है','आज क्या दिन है?'],en:['Someone called asking for my OTP','I took my medicine','I feel very lonely','I have chest pain','What day is it?']};
+const R=[
+{k:/chest|can'?t breathe|fell|dizzy|help me|सीने|साँस|सांस|गिर|चक्कर|बचाओ/i,hi:'यह गंभीर लग रहा है। मैं अभी रोहन को संदेश भेज रही हूँ। कृपया बैठ जाइए और 112 पर कॉल कीजिए। मैं आपके साथ हूँ।',en:'This sounds serious. I am messaging Rohan right now. Please sit down and call 112. I am right here with you.',al:{hi:'🚨 आपातकाल: "सीने में दर्द"। SMS/WhatsApp भेजा गया (डेमो)।',en:'🚨 Emergency: "chest pain". SMS/WhatsApp sent (demo).'},c:'',key:'distress'},
+{k:/otp|ओटीपी|kyc|केवाईसी|bank|बैंक|lottery|लॉटरी|gift card|arrest|पुलिस|account|पैसे भेज|send money/i,hi:'रुकिए, यह ठगी हो सकती है। बैंक कभी फ़ोन पर OTP नहीं माँगता। OTP किसी को न बताइए, फ़ोन काट दीजिए। मैं रोहन को बता दूँ?',en:'Please stop. This may be a scam. Banks never ask for an OTP on the phone. Do not share it. Hang up. Shall I tell Rohan?',al:{hi:'⚠️ संभावित ठगी कॉल (OTP/बैंक)।',en:'⚠️ Possible scam call (OTP/bank).'},c:'warn',key:'scam'},
+{k:/medicine|tablet|dawai|दवा|दवाई|गोली/i,hi:'बहुत अच्छा! मैंने नोट कर लिया कि सुबह की गोली ले ली। पानी भी पी लीजिए।',en:'Wonderful! I have noted your morning tablet. Please have some water too.',tick:1},
+{k:/akela|अकेल|lonely|alone|miss|याद/i,hi:'मैं समझती हूँ, ऐसा लगना स्वाभाविक है। अपनी पसंद का कोई भजन या पुरानी बात सुनाइए। और क्या आज रोहन से बात करें? मैं फ़ोन लगाने में मदद करूँगी।',en:'I understand, that feels heavy sometimes. Tell me about a favourite song or an old memory. And shall we call Rohan today? I can help.',key:'lonely'},
+{k:/day|date|दिन|तारीख/i,hi:()=>'आज '+new Date().toLocaleDateString('hi-IN',{weekday:'long',day:'numeric',month:'long'})+' है।',en:()=>'Today is '+new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})+'.'}];
+const SC=[
+{k:/otp|ओटीपी|pin|cvv|पिन/i,hi:'OTP/पिन माँगा गया। असली बैंक कभी नहीं माँगता।',en:'Asks for an OTP/PIN. Real banks never do.',w:3},
+{k:/digital arrest|cbi|customs|police|पुलिस|गिरफ्तार|arrest|narcotics/i,hi:'पुलिस/CBI के नाम पर डराना। "डिजिटल अरेस्ट" जैसी कोई चीज़ नहीं होती।',en:'Threatens with police/CBI. "Digital arrest" does not exist.',w:3},
+{k:/anydesk|teamviewer|quicksupport|screen share|स्क्रीन शेयर/i,hi:'फ़ोन का कंट्रोल माँगने वाला ऐप।',en:'Asks you to install a remote-control app.',w:3},
+{k:/kyc|केवाईसी|blocked|block|बंद|suspend|expire|urgent|तुरंत|अभी/i,hi:'जल्दबाज़ी या अकाउंट बंद होने का डर।',en:'Pressure: account blocked, act now.',w:2},
+{k:/lottery|लॉटरी|prize|इनाम|won|जीत|reward/i,hi:'इनाम या लॉटरी का लालच।',en:'Prize or lottery bait.',w:2},
+{k:/gift card|upi|transfer|send money|पैसे भेज|पैसा भेज|ट्रांसफर|fee|फीस/i,hi:'पैसे भेजने की माँग।',en:'Asks you to send money.',w:2},
+{k:/https?:\/\/|bit\.ly|\.apk|link|लिंक/i,hi:'अनजान लिंक या ऐप।',en:'Unknown link or app.',w:1}];
+const RULES={hi:['OTP, पिन, CVV किसी को नहीं बताना: बैंक वाले को भी नहीं।','पुलिस या CBI फ़ोन पर गिरफ्तार नहीं करती।','पैसे या गिफ्ट कार्ड भेजने को कहे तो रुकिए।','जल्दी मचाए तो और भी शक कीजिए।','फ़ोन रखिए, फिर परिवार को बताइए।'],en:['Never share OTP, PIN or CVV: not even with "the bank".','Police or CBI never arrest anyone over a phone call.','If asked to send money or gift cards, stop.','The more they rush you, the more suspicious to be.','Hang up first, then tell your family.']};
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',3500)}
+function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=S.lang==='hi'?'hi-IN':'en-IN';u.rate=.8;speechSynthesis.speak(u)}catch(e){}}
+function addAlert(t,c){S.alerts.unshift({t,c,time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})})}
+function drawChat(){const c=$('#chat');if(!c)return;c.innerHTML='';S.chat.forEach(m=>{const d=document.createElement('div');d.className='b '+m.c;d.textContent=m.t;c.appendChild(d)});c.scrollTop=1e5}
+function say(t){S.chat.push({t,c:'s'});drawChat();speak(t)}
+function handle(text){text=text.trim();if(!text)return;S.chat.push({t:text,c:'u'});S.log.chats++;
+ const h=R.find(r=>r.k.test(text));
+ if(!h){say(S.lang==='hi'?'जी, मैं सुन रही हूँ। थोड़ा और बताइए?':'I am listening. Tell me a little more?');return}
+ if(h.key)S.log[h.key]++;if(h.tick)S.rems[0].d=1;
+ if(h.al)addAlert(h.al,h.c);
+ const r=h[S.lang];say(typeof r==='function'?r():r)}
+function sos(){const m={hi:'🚨 SOS दबाया गया। SMS/WhatsApp भेजा गया (डेमो)।',en:'🚨 SOS pressed. SMS/WhatsApp sent (demo).'};addAlert(m,'');S.log.distress++;
+ const t=S.lang==='hi'?'मैं रोहन को अभी बता रही हूँ। कृपया बैठ जाइए। मदद के लिए 112 पर कॉल कीजिए।':'I am telling Rohan right now. Please sit down. Call 112 for help.';
+ if(S.page==='home')say(t);else{toast(t);speak(t)}}
+function summary(){const n=S.rems.filter(r=>r.d).length,l=S.log;
+ return S.consent.summary?(S.lang==='hi'?`आज का सारांश\nबातचीत: ${l.chats} · याद दिलाना: ${n}/${S.rems.length} पूरा · ठगी चेतावनी: ${l.scam} · संकट: ${l.distress} · अकेलापन: ${l.lonely}\nसुझाव: आज एक फ़ोन कॉल कीजिए 💛`:`Today's summary\nChats: ${l.chats} · Reminders: ${n}/${S.rems.length} done · Scam warnings: ${l.scam} · Distress: ${l.distress} · Lonely: ${l.lonely}\nTip: give her a call today 💛`):(S.lang==='hi'?'सारांश बंद है (सहमति नहीं)।':'Summary is off (no consent).')}
+const alertsHtml=()=>S.alerts.length?S.alerts.map(a=>`<div class="alert ${a.c}">${a.time}  ${L(a.t)}</div>`).join(''):`<small>${L({hi:'कोई अलर्ट नहीं',en:'No alerts'})}</small>`;
+const P={
+home(){return `<div class="g"><section class="card"><h2>${L({hi:'साथी से बात करें',en:'Talk to Saathi'})}</h2>
+<button class="mic" id="mic">🎤 ${L({hi:'बोलिए',en:'Speak'})}</button><div id="st" class="mu" style="text-align:center">${L({hi:'बटन दबाकर बोलिए, या नीचे लिखिए',en:'Press and speak, or type below'})}</div>
+<div id="chat" aria-live="polite"></div><div class="chips">${CH[S.lang].map(c=>`<button class="bt" data-chip="${c}">${c}</button>`).join('')}</div>
+<form id="f"><input type="text" id="in" aria-label="message" placeholder="${L({hi:'यहाँ लिखिए…',en:'Type here…'})}"><button class="pri">${L({hi:'भेजें',en:'Send'})}</button></form>
+<small>${L({hi:'डेमो: असली मॉडल की जगह नियम-आधारित जवाब। मेडिकल सलाह नहीं।',en:'Demo: rule-based replies stand in for the real model. Not medical advice.'})}</small></section>
+<section><div class="card"><h2>${L({hi:'आज की याद',en:"Today's reminders"})}</h2>${S.rems.map(r=>`<div class="rem"><span>${r.t}  ${r[S.lang]}</span><span class="${r.d?'ok':'mu'}">${r.d?'✓':'…'}</span></div>`).join('')}</div>
+<div class="card"><h2>${L({hi:'परिवार को भेजे अलर्ट',en:'Alerts sent to family'})}</h2>${alertsHtml()}</div></section></div>`},
+rem(){return `<div class="card"><h2>${L({hi:'दवा, खाना, पानी, डॉक्टर',en:'Medicine, meals, water, doctor'})}</h2>
+${S.rems.map((r,i)=>`<div class="rem"><span>${r.t}  ${r[S.lang]}</span><span><button class="bt" data-say="${i}">🔊</button> <button class="bt ${r.d?'on':''}" data-done="${i}">${r.d?'✓ '+L({hi:'हो गया',en:'Done'}):L({hi:'हो गया?',en:'Done?'})}</button></span></div>`).join('')}</div>
+<div class="card"><h2>${L({hi:'नई याद जोड़ें',en:'Add a reminder'})}</h2><form id="rf"><input type="time" id="rt" value="09:00" aria-label="time"><input type="text" id="rx" placeholder="${L({hi:'जैसे: शुगर की गोली',en:'e.g. Sugar tablet'})}"><button class="pri">${L({hi:'जोड़ें',en:'Add'})}</button></form>
+<small>${L({hi:'असली ऐप में साथी समय पर बोलकर पूछेगा और "हाँ" सुनकर पक्का करेगा। जवाब न मिले तो परिवार को बताएगा।',en:'In the real app Saathi speaks at the time, listens for "yes", and tells family if there is no answer.'})}</small></div>`},
+scam(){return `<div class="card"><h2>${L({hi:'क्या यह ठगी है? जाँचिए',en:'Is this a scam? Check it'})}</h2>
+<textarea id="sm" placeholder="${L({hi:'फ़ोन या मैसेज की बात यहाँ लिखिए…',en:'Paste what the caller or message said…'})}"></textarea>
+<div class="chips"><button class="bt" data-ex="0">${L({hi:'उदाहरण: बैंक कॉल',en:'Example: bank call'})}</button><button class="bt" data-ex="1">${L({hi:'उदाहरण: पुलिस कॉल',en:'Example: police call'})}</button></div>
+<button class="pri" id="chk">${L({hi:'जाँचें',en:'Check'})}</button><div id="vd"></div></div>
+<div class="card"><h2>${L({hi:'5 सुनहरे नियम',en:'5 golden rules'})}</h2><ul>${RULES[S.lang].map(x=>`<li>${x}</li>`).join('')}</ul></div>`},
+fam(){const c=S.consent;return `<div class="g"><section class="card"><h2>${L({hi:'रोहन (बेटा) का डैशबोर्ड',en:"Rohan's (son) dashboard"})}</h2><div id="sum" style="white-space:pre-line">${summary()}</div>
+<h3>${L({hi:'अलर्ट',en:'Alerts'})}</h3>${alertsHtml()}<button class="bt" id="ta">${L({hi:'टेस्ट अलर्ट भेजें',en:'Send test alert'})}</button></section>
+<section class="card"><h2>${L({hi:'बुज़ुर्ग की सहमति',en:"Senior's consent"})}</h2>
+<label><input type="checkbox" data-c="summary" ${c.summary?'checked':''}>${L({hi:'रोज़ का सारांश साझा करें',en:'Share daily summary'})}</label>
+<label><input type="checkbox" data-c="alerts" ${c.alerts?'checked':''}>${L({hi:'आपात अलर्ट भेजें',en:'Send emergency alerts'})}</label>
+<label><input type="checkbox" data-c="rems" ${c.rems?'checked':''}>${L({hi:'दवा की स्थिति साझा करें',en:'Share medicine status'})}</label>
+<small>${L({hi:'बातचीत की रिकॉर्डिंग या पूरा टेक्स्ट परिवार को कभी नहीं दिखता। कभी भी बंद कर सकती हैं।',en:'Recordings and full chats are never shown to family. Can be switched off anytime.'})}</small></section></div>`},
+priv(){const rows=[[{hi:'डॉक्टर नहीं',en:'Not a doctor'},{hi:'कोई निदान या दवा की मात्रा नहीं। डॉक्टर या परिवार से पूछने को कहता है।',en:'No diagnosis or dose advice. Refers to doctor or family.'}],[{hi:'आपातकाल',en:'Emergency escalation'},{hi:'नियम AI से पहले चलते हैं। इंसान को ज़रूर खबर जाती है।',en:'Rules run before the AI. A human is always alerted.'}],[{hi:'निजता व सहमति',en:'Privacy and consent'},{hi:'कम से कम डेटा, ऑडियो सेव नहीं, हर चीज़ बंद करने का विकल्प।',en:'Minimal data, no audio stored, every share can be switched off.'}],[{hi:'सम्मान',en:'Dignity'},{hi:'"आप" और "जी"। कभी नीचा नहीं दिखाता। असली बुज़ुर्गों के साथ परीक्षण।',en:'Respectful "aap" and "ji". Never talks down. Tested with real elders.'}],[{hi:'निर्भरता नहीं',en:'No unhealthy dependence'},{hi:'परिवार से बात करने को प्रोत्साहित करता है। परिवार से कुछ छुपाने को नहीं कहता।',en:'Encourages calls to family. Never encourages secrecy from them.'}]];
+return `<div class="card"><h2>${L({hi:'भरोसा ही उत्पाद है',en:'Trust is the product'})}</h2>${rows.map(r=>`<div class="rem"><span><b class="ok">✓</b> <b>${L(r[0])}</b></span><span style="flex:1;margin-left:14px">${L(r[1])}</span></div>`).join('')}</div>
+<div class="card"><h2>${L({hi:'सच्ची सीमाएँ',en:'Honest limits'})}</h2><ul><li>${L({hi:'यह प्रोटोटाइप है; असली SMS/WhatsApp अभी जुड़े नहीं हैं।',en:'This is a prototype; real SMS/WhatsApp are not connected yet.'})}</li><li>${L({hi:'बोली और धीमी आवाज़ के लिए असली बुज़ुर्गों पर परीक्षण बाकी है।',en:'Accent and soft-speech accuracy still needs testing with real elders.'})}</li><li>${L({hi:'गंभीर स्थिति में हमेशा 112 पर कॉल करें।',en:'In a serious emergency always call 112.'})}</li></ul></div>`},
+about(){return `<div class="card"><h2>${L({hi:'हमारी समस्या',en:'The problem'})}</h2><p>${L({hi:'हमारे माता-पिता ने हमारा ख्याल रखा। अब उनका ख्याल कौन रखे? कई बुज़ुर्ग अकेले हैं, फ़ोन ठगों के निशाने पर हैं, और ऐप उनके लिए बहुत जटिल हैं।',en:'Our parents took care of us. Who takes care of them? Many seniors are lonely, targeted by phone scammers, and shut out by complicated apps.'})}</p></div>
+<div class="card"><h2>${L({hi:'हमारा तरीका',en:'Our approach'})}</h2><div class="g3"><div><b>${L({hi:'सिर्फ़ बोलिए',en:'Just talk'})}</b><br>${L({hi:'कोई मेन्यू नहीं, हिन्दी या अंग्रेज़ी।',en:'No menus. Hindi or English.'})}</div><div><b>${L({hi:'सुरक्षा पहले',en:'Safety first'})}</b><br>${L({hi:'आपात और ठगी के नियम AI से पहले।',en:'Emergency and scam rules run before the AI.'})}</div><div><b>${L({hi:'परिवार के करीब',en:'Closer to family'})}</b><br>${L({hi:'साथी परिवार की जगह नहीं लेता।',en:'Saathi never replaces family.'})}</div></div></div>
+<div class="card"><h2>${L({hi:'तकनीक',en:'Tech stack'})}</h2><p class="mu">Whisper STT · Rule-based safety gate · Qwen via Ollama · edge-tts / Piper · FastAPI + SQLite · Twilio / WhatsApp · PWA</p></div>
+<div class="card"><h2>${L({hi:'टीम',en:'Team'})}</h2><p class="mu">[Name] · [Name] · [Name] · [Name] · [Name]</p></div>`}};
+function render(){document.documentElement.lang=S.lang;$('#tag').textContent=L({hi:'आपका अपना साथी',en:'Your own companion'});
+ $('#lhi').classList.toggle('on',S.lang==='hi');$('#len').classList.toggle('on',S.lang==='en');
+ $('#nav').innerHTML=PAGES.map(p=>`<button class="bt ${S.page===p[0]?'on':''}" data-go="${p[0]}">${L(p[1])}</button>`).join('');
+ $('#app').innerHTML=P[S.page]();if(S.page==='home'){drawChat();if(!S.chat.length)say(S.lang==='hi'?'नमस्ते कमला जी! मैं साथी हूँ। आज आप कैसी हैं?':'Namaste! I am Saathi. How are you today?')}}
+function go(p){S.page=p;try{history.replaceState(null,'','#'+p)}catch(e){}render();window.scrollTo(0,0)}
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+if(SR){rec=new SR();rec.interimResults=false;rec.onresult=e=>handle(e.results[0][0].transcript);rec.onend=()=>{const m=$('#mic');if(m)m.classList.remove('on')};rec.onerror=()=>{const s=$('#st');if(s)s.textContent=L({hi:'सुनाई नहीं दिया, फिर बोलिए',en:'Could not hear, try again'})}}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.go)go(d.go);else if(d.chip)handle(d.chip);
+ else if(b.id==='mic'){if(!rec){$('#in').focus();return}if(b.classList.contains('on')){rec.stop();return}try{speechSynthesis.cancel();rec.lang=S.lang==='hi'?'hi-IN':'en-IN';rec.start();b.classList.add('on')}catch(x){}}
+ else if(d.done!==undefined){const r=S.rems[+d.done];r.d=r.d?0:1;if(r.d)speak(S.lang==='hi'?'शाबाश! नोट कर लिया।':'Well done! Noted.');render()}
+ else if(d.say!==undefined){const r=S.rems[+d.say];speak(S.lang==='hi'?`${r.t} बज गए। ${r.hi} का समय है। क्या आपने कर लिया?`:`It is ${r.t}. Time for: ${r.en}. Have you done it?`)}
+ else if(d.ex!==undefined){$('#sm').value=[ 'Hello sir, I am from SBI. Your KYC has expired and account will be blocked today. Please tell me the OTP sent to your phone.','This is CBI. A parcel in your name has drugs. You are under digital arrest. Install AnyDesk and transfer money to clear your name.'][+d.ex]}
+ else if(b.id==='chk'){const t=$('#sm').value,hits=SC.filter(r=>r.k.test(t)),sc=hits.reduce((a,r)=>a+r.w,0),v=$('#vd');
+  const cls=sc>=3?'hi':sc>=1?'me':'lo',msg=sc>=3?L({hi:'🚨 बहुत ज़्यादा ठगी का खतरा। फ़ोन काटिए, कुछ न भेजिए, परिवार को बताइए।',en:'🚨 Very likely a scam. Hang up, send nothing, tell your family.'}):sc>=1?L({hi:'⚠️ शक की बात है। किसी भरोसेमंद से पूछे बिना कुछ न करें।',en:'⚠️ Suspicious. Do nothing before asking someone you trust.'}):L({hi:'कोई साफ़ खतरा नहीं दिखा, फिर भी शक हो तो परिवार से पूछिए।',en:'No clear red flag, but if unsure, ask family.'});
+  v.innerHTML=`<div class="v ${cls}"></div><ul>${hits.map(h=>`<li>${L(h)}</li>`).join('')}</ul>`;v.firstChild.textContent=msg;
+  if(t.trim()&&sc>=3){S.log.scam++;addAlert({hi:'⚠️ ठगी जाँच में खतरा मिला।',en:'⚠️ Scam check flagged high risk.'},'warn')}speak(msg.slice(2))}
+ else if(b.id==='ta'){addAlert({hi:'टेस्ट अलर्ट भेजा गया (डेमो)।',en:'Test alert sent (demo).'},'warn');render()}
+ else if(b.id==='sos')sos();
+ else if(b.id==='lhi'){S.lang='hi';render()}else if(b.id==='len'){S.lang='en';render()}
+ else if(b.id==='fp'){S.fs=Math.min(1.5,S.fs+.1);document.documentElement.style.fontSize=18*S.fs+'px'}
+ else if(b.id==='fm'){S.fs=Math.max(.8,S.fs-.1);document.documentElement.style.fontSize=18*S.fs+'px'}
+ else if(b.id==='hc'){S.hc=!S.hc;document.documentElement.dataset.hc=S.hc?'1':'0'}});
+document.addEventListener('change',e=>{if(e.target.dataset.c){S.consent[e.target.dataset.c]=e.target.checked;render()}});
+document.addEventListener('submit',e=>{e.preventDefault();if(e.target.id==='f'){handle($('#in').value);$('#in').value=''}
+ if(e.target.id==='rf'){const x=$('#rx').value.trim();if(!x)return;S.rems.push({t:$('#rt').value,hi:x,en:x,d:0});S.rems.sort((a,b)=>a.t.localeCompare(b.t));render()}});
+const h0=location.hash.slice(1);if(P[h0])S.page=h0;render();
+</script></body></html>
